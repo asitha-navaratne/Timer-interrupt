@@ -10,7 +10,8 @@
 #define LED_PORT 		PORTC							///< Port of indicator LED.
 #define NUMERAL_PORT 	PORTB							///< Port for controlling individual segments.
 #define CONTROL_PORT 	PORTD							///< Port for controlling individual digits.
-#define LED_PIN			PC0								///< Pin of indicator LED.
+#define LED_PIN1		PC0								///< Pin of first indicator LED.
+#define LED_PIN2		PC1								///< Pin of second indicator LED.
 #define DIGIT1_PIN		PD0								///< Pin controlling first digit of SSD.
 #define DIGIT2_PIN		PD1								///< Pin controlling second digit of SSD.
 #define DIGIT3_PIN		PD2								///< Pin controlling third digit of SSD.
@@ -36,6 +37,7 @@ uint16_t time = 1000;									///< Variable to hold the required time the ISR sh
 ISR(TIMER0_COMP_vect){
 	milliseconds++;
 	count++;
+	LED_PORT ^= (1<<LED_PIN2);
 	if(milliseconds > time){
 		working = 0;
 		milliseconds = 0;
@@ -53,7 +55,7 @@ int main(void){
 		
 		cli();								///< Disable global interrupts.
 		
-		LED_PORT ^= (1<<LED_PIN);
+		LED_PORT ^= (1<<LED_PIN1);
 		
 		DECODE_SSD(count);
 		DISPLAY_SSD();
@@ -61,7 +63,7 @@ int main(void){
 		count = 0;
 		working = 1;
 		
-		LED_PORT ^= (1<<LED_PIN);
+		LED_PORT ^= (1<<LED_PIN1);
 	}
 }
 
@@ -70,7 +72,7 @@ int main(void){
  */
 
 void PORT_INIT(void){
-	LED_DDR |= (1<<LED_PIN);
+	LED_DDR |= (1<<LED_PIN1)|(1<<LED_PIN2);
 	NUMERAL_DDR = 0xFF;
 	CONTROL_DDR |= (1<<DIGIT1_PIN)|(1<<DIGIT2_PIN)|(1<<DIGIT3_PIN)|(1<<DIGIT4_PIN);
 }
